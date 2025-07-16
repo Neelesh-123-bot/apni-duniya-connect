@@ -3,23 +3,44 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '@/services/authService';
+import { useToast } from '@/hooks/use-toast';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login:', formData);
+    setLoading(true);
+
+    try {
+      const response = await authService.login(formData);
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully logged in.",
+      });
+      navigate('/app');
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 gradient-social">
+    <div className="min-h-screen flex items-center justify-center p-4 gradient-hero">
       <Card className="w-full max-w-md shadow-strong">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold gradient-primary bg-clip-text text-transparent">
@@ -59,8 +80,8 @@ const LoginForm = () => {
               </button>
             </div>
             
-            <Button type="submit" className="w-full gradient-primary">
-              Sign In
+            <Button type="submit" disabled={loading} className="w-full gradient-primary">
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
           

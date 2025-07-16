@@ -1,18 +1,41 @@
+import { useState, useEffect } from 'react';
 import Stories from '@/components/Feed/Stories';
 import PostCard from '@/components/Post/PostCard';
 import SuggestedUsers from '@/components/Feed/SuggestedUsers';
+import { postService } from '@/services/postService';
+import { authService } from '@/services/authService';
+import { useToast } from '@/hooks/use-toast';
 
 const Home = () => {
-  // Mock data - in real app, this would come from API
-  const stories = [
-    { id: '1', user: { username: 'john_doe', avatar: '/api/placeholder/64/64' }, viewed: false },
-    { id: '2', user: { username: 'jane_smith', avatar: '/api/placeholder/64/64' }, viewed: true },
-    { id: '3', user: { username: 'mike_wilson', avatar: '/api/placeholder/64/64' }, viewed: false },
-    { id: '4', user: { username: 'sarah_jones', avatar: '/api/placeholder/64/64' }, viewed: false },
-    { id: '5', user: { username: 'alex_brown', avatar: '/api/placeholder/64/64' }, viewed: true },
-  ];
+  const [posts, setPosts] = useState([]);
+  const [suggestedUsers, setSuggestedUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  const posts = [
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [postsResponse, suggestedResponse] = await Promise.all([
+        postService.getAllPosts(),
+        authService.getSuggestedUsers()
+      ]);
+      
+      setPosts(postsResponse.posts || mockPosts);
+      setSuggestedUsers(suggestedResponse.users || mockSuggestedUsers);
+    } catch (error) {
+      console.log('Using mock data - API not connected');
+      setPosts(mockPosts);
+      setSuggestedUsers(mockSuggestedUsers);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock data as fallback
+  const mockPosts = [
     {
       id: '1',
       user: {
@@ -60,7 +83,7 @@ const Home = () => {
     }
   ];
 
-  const suggestedUsers = [
+  const mockSuggestedUsers = [
     {
       id: '1',
       username: 'design_master',
@@ -84,19 +107,37 @@ const Home = () => {
     }
   ];
 
+  // Mock stories data
+  const stories = [
+    { id: '1', user: { username: 'john_doe', avatar: '/api/placeholder/64/64' }, viewed: false },
+    { id: '2', user: { username: 'jane_smith', avatar: '/api/placeholder/64/64' }, viewed: true },
+    { id: '3', user: { username: 'mike_wilson', avatar: '/api/placeholder/64/64' }, viewed: false },
+    { id: '4', user: { username: 'sarah_jones', avatar: '/api/placeholder/64/64' }, viewed: false },
+    { id: '5', user: { username: 'alex_brown', avatar: '/api/placeholder/64/64' }, viewed: true },
+  ];
+
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 pt-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-20 bg-muted rounded-lg"></div>
+          <div className="h-96 bg-muted rounded-lg"></div>
+          <div className="h-96 bg-muted rounded-lg"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Stories Section */}
       <Stories stories={stories} />
       
       <div className="px-4">
-        {/* Suggested Users */}
         <SuggestedUsers users={suggestedUsers} />
         
-        {/* Posts Feed */}
         <div>
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} onUpdate={fetchData} />
           ))}
         </div>
       </div>

@@ -3,25 +3,46 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '@/services/authService';
+import { useToast } from '@/hooks/use-toast';
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
     email: '',
     password: '',
   });
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log('Register:', formData);
+    setLoading(true);
+
+    try {
+      const response = await authService.register(formData);
+      toast({
+        title: "Account created!",
+        description: "Welcome to Apni Duniya! Please log in to continue.",
+      });
+      navigate('/login');
+    } catch (error) {
+      toast({
+        title: "Registration failed",
+        description: error.message || "Please try again with different details.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 gradient-social">
+    <div className="min-h-screen flex items-center justify-center p-4 gradient-hero">
       <Card className="w-full max-w-md shadow-strong">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold gradient-primary bg-clip-text text-transparent">

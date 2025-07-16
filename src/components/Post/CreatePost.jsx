@@ -1,34 +1,68 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ImagePlus, X } from 'lucide-react';
+import { postService } from '@/services/postService';
+import { useToast } from '@/hooks/use-toast';
 
 const CreatePost = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [caption, setCaption] = useState('');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event) => {
     const file = event.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = () => {
-        setSelectedImage(reader.result as string);
+        setSelectedImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = () => {
-    // Handle post creation logic here
-    console.log('Creating post:', { caption, image: selectedImage });
-    setIsOpen(false);
-    setCaption('');
-    setSelectedImage(null);
+  const handleSubmit = async () => {
+    if (!imageFile) {
+      toast({
+        title: "Image required",
+        description: "Please select an image to share.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await postService.addPost({
+        caption,
+        image: imageFile,
+      });
+      
+      toast({
+        title: "Post created!",
+        description: "Your post has been shared successfully.",
+      });
+      
+      setIsOpen(false);
+      setCaption('');
+      setSelectedImage(null);
+      setImageFile(null);
+    } catch (error) {
+      toast({
+        title: "Failed to create post",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,10 +140,10 @@ const CreatePost = () => {
           {/* Submit Button */}
           <Button
             onClick={handleSubmit}
-            disabled={!selectedImage}
+            disabled={!selectedImage || loading}
             className="w-full gradient-primary"
           >
-            Share Post
+            {loading ? 'Sharing...' : 'Share Post'}
           </Button>
         </div>
       </DialogContent>

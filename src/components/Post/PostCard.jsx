@@ -3,37 +3,52 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState } from 'react';
+import { postService } from '@/services/postService';
+import { useToast } from '@/hooks/use-toast';
 
-interface PostCardProps {
-  post: {
-    id: string;
-    user: {
-      username: string;
-      fullName: string;
-      avatar: string;
-    };
-    image: string;
-    caption: string;
-    likes: number;
-    comments: number;
-    timeAgo: string;
-    liked: boolean;
-    bookmarked: boolean;
-  };
-}
-
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = ({ post, onUpdate }) => {
   const [liked, setLiked] = useState(post.liked);
   const [bookmarked, setBookmarked] = useState(post.bookmarked);
   const [likesCount, setLikesCount] = useState(post.likes);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikesCount(liked ? likesCount - 1 : likesCount + 1);
+  const handleLike = async () => {
+    setLoading(true);
+    try {
+      if (liked) {
+        await postService.dislikePost(post.id);
+      } else {
+        await postService.likePost(post.id);
+      }
+      setLiked(!liked);
+      setLikesCount(liked ? likesCount - 1 : likesCount + 1);
+    } catch (error) {
+      toast({
+        title: "Action failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleBookmark = () => {
-    setBookmarked(!bookmarked);
+  const handleBookmark = async () => {
+    try {
+      await postService.bookmarkPost(post.id);
+      setBookmarked(!bookmarked);
+      toast({
+        title: bookmarked ? "Removed from bookmarks" : "Added to bookmarks",
+        description: bookmarked ? "Post removed from your saved items." : "Post saved to your bookmarks.",
+      });
+    } catch (error) {
+      toast({
+        title: "Action failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -73,7 +88,8 @@ const PostCard = ({ post }: PostCardProps) => {
                 variant="ghost"
                 size="sm"
                 onClick={handleLike}
-                className={`like-button p-1 ${liked ? 'text-red-500' : 'text-foreground'}`}
+                disabled={loading}
+                className={`like-button p-1 ${liked ? 'text-coral' : 'text-foreground'}`}
               >
                 <Heart size={24} fill={liked ? 'currentColor' : 'none'} />
               </Button>

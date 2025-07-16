@@ -9,49 +9,57 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 220 12% 9%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 12% 9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 12% 9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 269 91% 58%;
+    --primary: 174 83% 47%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 280 100% 70%;
+    --primary-glow: 180 100% 65%;
 
-    --secondary: 250 9% 95%;
-    --secondary-foreground: 220 12% 9%;
+    --secondary: 15 100% 95%;
+    --secondary-foreground: 215 25% 15%;
 
-    --muted: 250 9% 95%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 15 100% 95%;
+    --muted-foreground: 215 15% 46%;
 
-    --accent: 280 100% 97%;
-    --accent-foreground: 269 91% 58%;
+    --accent: 174 100% 97%;
+    --accent-foreground: 174 83% 47%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 250 12% 91%;
-    --input: 250 12% 91%;
-    --ring: 269 91% 58%;
+    --border: 15 30% 91%;
+    --input: 15 30% 91%;
+    --ring: 174 83% 47%;
 
-    /* Social Media Specific Colors */
-    --social-blue: 217 91% 60%;
-    --social-pink: 326 78% 60%;
-    --social-success: 142 76% 36%;
-    --social-warning: 38 92% 50%;
+    /* Apni Duniya Specific Colors */
+    --coral: 16 100% 66%;
+    --coral-light: 16 100% 85%;
+    --teal: 174 83% 47%;
+    --teal-light: 174 100% 80%;
+    --orange: 25 95% 53%;
+    --orange-light: 25 100% 85%;
+    --mint: 151 55% 53%;
+    --mint-light: 151 68% 85%;
+    --violet: 250 84% 54%;
+    --violet-light: 250 100% 85%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-social: linear-gradient(135deg, hsl(var(--social-blue)), hsl(var(--primary)));
-    --gradient-story: linear-gradient(45deg, hsl(var(--social-pink)), hsl(var(--primary)), hsl(var(--social-blue)));
+    --gradient-primary: linear-gradient(135deg, hsl(174 83% 47%), hsl(16 100% 66%));
+    --gradient-secondary: linear-gradient(135deg, hsl(25 95% 53%), hsl(174 83% 47%));
+    --gradient-hero: linear-gradient(135deg, hsl(174 83% 47%), hsl(16 100% 66%), hsl(25 95% 53%));
+    --gradient-card: linear-gradient(135deg, hsl(174 100% 97%), hsl(16 100% 98%));
 
     /* Shadows */
-    --shadow-soft: 0 2px 12px hsl(var(--primary) / 0.1);
-    --shadow-medium: 0 4px 20px hsl(var(--primary) / 0.15);
-    --shadow-strong: 0 8px 30px hsl(var(--primary) / 0.2);
+    --shadow-soft: 0 2px 12px hsl(174 83% 47% / 0.1);
+    --shadow-medium: 0 4px 20px hsl(174 83% 47% / 0.15);
+    --shadow-strong: 0 8px 30px hsl(174 83% 47% / 0.2);
+    --shadow-coral: 0 4px 20px hsl(16 100% 66% / 0.3);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -126,17 +134,21 @@ All colors MUST be HSL.
 }
 
 @layer components {
-  /* Social Media Component Styles */
+  /* Apni Duniya Component Styles */
   .gradient-primary {
     background: var(--gradient-primary);
   }
   
-  .gradient-social {
-    background: var(--gradient-social);
+  .gradient-secondary {
+    background: var(--gradient-secondary);
   }
   
-  .gradient-story {
-    background: var(--gradient-story);
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .gradient-card {
+    background: var(--gradient-card);
   }
   
   .shadow-soft {
@@ -165,7 +177,8 @@ All colors MUST be HSL.
   }
   
   .story-ring {
-    @apply gradient-story p-0.5 rounded-full;
+    background: var(--gradient-secondary);
+    @apply p-0.5 rounded-full;
   }
   
   .like-button {

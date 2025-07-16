@@ -31,7 +31,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center gradient-social">
+      <section className="relative h-screen flex items-center justify-center gradient-hero">
         <div className="absolute inset-0 bg-black/20"></div>
         <img 
           src={heroImage} 
@@ -88,7 +88,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 gradient-social">
+      <section className="py-20 gradient-secondary">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl font-bold text-white mb-6">
             Ready to Start Your Journey?
